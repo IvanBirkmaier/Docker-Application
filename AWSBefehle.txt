@@ -1,0 +1,44 @@
+AWS_BEFEHLE UM ZWISCHEN DEN CLUSTERN ZU SWITCHEN:
+1. zu Localen k3d Cluster wechseln: kubectl config use-context k3d-mycluster
+2. zu AWS Cluster wechseln:kubectl config use-context arn:aws:eks:eu-central-1:347859698802:cluster/htw-cluster
+3. gegenchecken mit kubectl get ns (Namespaces. Wenn welche vorhande, dann  ist man auf dem AWS cluster wenn nicht, ist man auf dem normalen)
+4. kubectl port-forward svc/webserver 8081:8081 -n htw-gruppe-3 (Startet aws cluster)
+
+AWS_REPO BEFEHLE:
+1. aws ecr create-repository --repository-name <ReproName> (RepoName komplett erstezten, mit <> und alles klein schreiben ohne komische Sonderzeichen Pimmel)
+2. aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin 347859698802.dkr.ecr.eu-central-1.amazonaws.com (zum einlogen in Aws Pimmel)
+3. docker tag (alpine:3.13.6) 347859698802.dkr.ecr.eu-central-1.amazonaws.com/(alpine:3.15.4) (hinter tag, den Name+tag deines Dockerimages was du ins AWS Repo pushen willst
+einfügen. Findet man mit Docker ps. Und ganz hinten den namen des Repos in das du es reinpushen willst)
+4. docker push 347859698802.dkr.ecr.eu-central-1.amazonaws.com/(alpine:3.15.4) (anstelle alpine... tragt man den namen des Repos + den tag ein, wie man das image im Repo heißen soll
+  bsp. (htw-gruppe-3:webscraper))
+
+  K3D_BEFEHLE / MAKE_BEFEHLE:
+  1. kubectl get po => Zeigt laufenden Container (Pods) Im k3d Cluster anstelle
+  2.reinfolge von Makebefehlen.  make start_k3d (baut ,befüllt cluster) -> make start (Startet Anwendung) -> make stop (stopt anwendung) -> make delete_k3d (löscht CXluster)
+
+  DOCKER_BEFEHLE / DOCKER_COMPOSE BEFEHLE
+  1. docker ps => Liste aller laufendeden Images
+  2. docker logs (image) => gibt die Logs von einem Image zurück
+  3.docker run -p 8081:8081 -v etc/nginx/data/ webserver:latest (startet im jeweils richtigen vertzeichnis ein dockerfile/Image)
+
+
+  docker exce für infos
+   docker exec -it webscraper bash
+   docker rm -vf $(docker ps -aq) löscht alle container
+   docker rmi -f $(docker images -aq) löscht alle images
+   docker kill $(docker ps -q) stopt alle container
+
+   freie ports:
+
+   55640
+   49671
+   
+
+   uvicorn main:app --host ${HOST} --port ${PORT}
+
+  CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
+
+  webscraper:49671/
+
+
+

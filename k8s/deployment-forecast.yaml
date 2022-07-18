@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: forecast
+spec:
+  selector:
+    matchLabels:
+      app: forecast
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: forecast
+    spec:
+      containers:
+      - name: forecast
+        image: registry:5000/forecast:latest
+        env:
+          - name: GETDATASERVICE_NAME
+            value: getdata
+        resources:
+          limits:
+            cpu: 300m
+            memory: 300Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        livenessProbe:
+          exec:
+            command:
+              - python 
+              - -V
+          initialDelaySeconds: 20
+          timeoutSeconds: 1
+          periodSeconds: 10
+          failureThreshold: 1
+        readinessProbe:
+          exec:
+            command:
+              - python
+              - -h
+          initialDelaySeconds: 20
+          timeoutSeconds: 1
+          periodSeconds: 10
+          failureThreshold: 1
+        volumeMounts:
+          - mountPath: "/data"
+            name: pv-storage
+      securityContext:
+        fsGroup: 1001
+      volumes:
+        - name: pv-storage
+          persistentVolumeClaim:
+            claimName: pv-claim

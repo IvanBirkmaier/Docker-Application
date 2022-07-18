@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: getdata
+  labels:
+    k8s-app: getdata
+spec:
+  containers:
+  - name: getdata
+    image: 327348940416.dkr.ecr.eu-central-1.amazonaws.com/getdata:latest
+    resources:
+      limits:
+        cpu: 300m
+        memory: 300Mi
+      requests:
+        cpu: 100m
+        memory: 100Mi
+    envFrom:
+    - configMapRef:
+        name: config
+    env:
+      - name: ALPHA_VANTAGE_FREE_KEY
+        valueFrom:
+          secretKeyRef:
+            name: alpha-vantage-free-key-secret
+            key: ALPHA_VANTAGE_FREE_KEY
+    livenessProbe:
+      exec:
+        command:
+          - curl
+          - https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=BA&apikey=demo
+      initialDelaySeconds: 5
+      timeoutSeconds: 1
+      periodSeconds: 10
+      failureThreshold: 1
+    readinessProbe:
+      exec:
+        command:
+          - python
+          - -h
+      initialDelaySeconds: 5
+      timeoutSeconds: 1
+      periodSeconds: 10
+      failureThreshold: 1
+    volumeMounts:
+      - name: dax-configmap-volume
+        mountPath: /app/dax-aktien.txt
+        subPath: dax-aktien.txt
+      - mountPath: "/data"
+        name: pv-storage
+      - mountPath: "/data/csv"
+        name: pv-storage
+  securityContext:
+    fsGroup: 1001
+  volumes:
+    - name: pv-storage
+      persistentVolumeClaim:
+        claimName: pv-claim
+    - name: dax-configmap-volume
+      configMap:
+        name: dax-configmap
+  restartPolicy: Never

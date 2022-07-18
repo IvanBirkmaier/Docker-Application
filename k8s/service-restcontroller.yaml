@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  # This name uniquely identifies the service
+  name: restcontroller
+spec:
+  type: ClusterIP
+  ports:
+    - port: 12345
+      name: inside
+      targetPort: 12345
+      protocol: TCP
+  selector:
+    # Looks for labels `app restcontroller` in the namespace and applies the spec
+    app: restcontroller

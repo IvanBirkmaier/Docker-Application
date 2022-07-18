@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: restcontroller
+spec:
+  selector:
+    matchLabels:
+      app: restcontroller
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: restcontroller
+    spec:
+      containers:
+      - name: restcontroller
+        image: registry:5000/restcontroller:latest
+        resources:
+          limits:
+            cpu: 300m
+            memory: 300Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        livenessProbe:
+          exec:
+            command:
+              - python 
+              - -V
+          initialDelaySeconds: 20
+          timeoutSeconds: 1
+          periodSeconds: 10
+          failureThreshold: 1
+        readinessProbe:
+          exec:
+            command:
+              - python
+              - -h
+          initialDelaySeconds: 20
+          timeoutSeconds: 1
+          periodSeconds: 10
+          failureThreshold: 1
+        volumeMounts:
+          - mountPath: "/data"
+            name: pv-storage
+      securityContext:
+        fsGroup: 1001
+      volumes:
+        - name: pv-storage
+          persistentVolumeClaim:
+            claimName: pv-claim

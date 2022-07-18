@@ -1,0 +1,96 @@
+stages:
+    - build
+    - scan
+    - push
+    - eks
+
+variables:
+  AWS_REGISTRY: "347859698802.dkr.ecr.eu-central-1.amazonaws.com"
+  NAMESPACE: "htw-gruppe-3"
+
+build_getdata:
+  stage: build
+  tags:
+    - aws
+  script:
+    - cd getdataservice
+    - docker build -t getdata:$CI_PIPELINE_ID .
+
+build_forecast:
+  stage: build
+  tags:
+    - aws
+  script:
+    - cd forecastservice
+    - docker build -t forecast:$CI_PIPELINE_ID .
+
+build_webserver:
+  stage: build
+  tags:
+    - aws
+  script:
+    - cd webserver
+    - docker build -t webserver:$CI_PIPELINE_ID .
+
+build_restcontroller:
+  stage: build
+  tags:
+    - aws
+  script:
+    - cd restcontroller
+    - docker build -t restcontroller:$CI_PIPELINE_ID .
+
+scan_trivy:
+  stage: scan
+  tags:
+    - aws
+  script:
+    #- trivy image --severity HIGH,CRITICAL --no-progress --exit-code 1  forecast:$CI_PIPELINE_ID
+    - trivy image --severity HIGH,CRITICAL --no-progress --exit-code 1  getdata:$CI_PIPELINE_ID
+    - trivy image --severity HIGH,CRITICAL --no-progress --exit-code 1  webserver:$CI_PIPELINE_ID
+    #- trivy image --severity HIGH,CRITICAL --no-progress --exit-code 1  restcontroller:$CI_PIPELINE_ID
+
+
+push_to_ecr:
+  stage: push
+  tags:
+    - aws
+  script:
+    - aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin 347859698802.dkr.ecr.eu-central-1.amazonaws.com
+    - docker tag getdata:$CI_PIPELINE_ID 347859698802.dkr.ecr.eu-central-1.amazonaws.com/getdata:$CI_PIPELINE_ID
+    - docker tag forecast:$CI_PIPELINE_ID 347859698802.dkr.ecr.eu-central-1.amazonaws.com/forecast:$CI_PIPELINE_ID
+    - docker tag webserver:$CI_PIPELINE_ID 347859698802.dkr.ecr.eu-central-1.amazonaws.com/webserver:$CI_PIPELINE_ID
+    - docker tag restcontroller:$CI_PIPELINE_ID 347859698802.dkr.ecr.eu-central-1.amazonaws.com/restcontroller:$CI_PIPELINE_ID
+    - docker push 347859698802.dkr.ecr.eu-central-1.amazonaws.com/getdata:$CI_PIPELINE_ID
+    - docker push 347859698802.dkr.ecr.eu-central-1.amazonaws.com/forecast:$CI_PIPELINE_ID
+    - docker push 347859698802.dkr.ecr.eu-central-1.amazonaws.com/webserver:$CI_PIPELINE_ID
+    - docker push 347859698802.dkr.ecr.eu-central-1.amazonaws.com/restcontroller:$CI_PIPELINE_ID
+  only:
+    - develop
+
+
+deploy_to_eks:
+  stage: eks
+  tags:
+    - aws
+  script:
+    - kubectl apply -f k8s/aws-persistent-volume.yaml -n $NAMESPACE
+    - kubectl apply -f k8s/secret-alpha-vantage-free-key.yaml -n $NAMESPACE
+    - kubectl apply -f k8s/secret-minio.yaml -n $NAMESPACE
+    - kubectl apply -f k8s/service-minio.yaml -n $NAMESPACE
+    - kubectl apply -f k8s/deployment-minio.yaml -n $NAMESPACE    
+    - kubectl apply -f k8s/pod-createbucketsminio.yaml -n $NAMESPACE
+    - sed -i "s/registry:5000\/getdata:latest/$AWS_REGISTRY\/getdata:$CI_PIPELINE_ID/g" k8s/pod-getdata.yaml
+    - sed -i "s/registry:5000\/forecast:latest/$AWS_REGISTRY\/forecast:$CI_PIPELINE_ID/g" k8s/deployment-forecast.yaml
+    - sed -i "s/registry:5000\/webserver:latest/$AWS_REGISTRY\/webserver:$CI_PIPELINE_ID/g" k8s/deployment-webserver.yaml
+    - sed -i "s/registry:5000\/restcontroller:latest/$AWS_REGISTRY\/restcontroller:$CI_PIPELINE_ID/g" k8s/deployment-restcontroller.yaml
+    - kubectl apply -f k8s/pod-getdata.yaml -n $NAMESPACE
+    - kubectl apply -f k8s/deployment-forecast.yaml -n $NAMESPACE
+    - kubectl apply -f k8s/deployment-webserver.yaml -n $NAMESPACE
+    - kubectl apply -f k8s/deployment-restcontroller.yaml -n $NAMESPACE
+    - kubectl apply -f k8s/service-webserver.yaml -n $NAMESPACE
+    - kubectl apply -f k8s/service-restcontroller.yaml -n $NAMESPACE
+  only:
+    - develop
+
+  

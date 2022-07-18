@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: createbucketsminio
+  labels:
+    app: createbucketsminio
+spec:
+  containers:
+  - name: createbucketsminio
+    image: minio/mc:RELEASE.2021-09-02T09-21-27Z
+    command: ["/bin/sh","-c"]
+    args:
+     - while ! curl --silent -o /dev/null http://minio:9000; do echo 'Wait minio to startup...' && sleep 0.3; done; 
+       sleep 5;
+       /usr/bin/mc config host add myminio http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD};
+       /usr/bin/mc mb -p myminio/rohdata;
+       /usr/bin/mc policy set public myminio/rohdata;
+       /usr/bin/mc mb -p myminio/csv;
+       /usr/bin/mc policy set public myminio/csv;
+       /usr/bin/mc mb -p myminio/forecast;
+       /usr/bin/mc policy set public myminio/forecast;
+    resources:
+      limits:
+        cpu: 300m
+        memory: 300Mi
+      requests:
+        cpu: 100m
+        memory: 100Mi
+    env:
+      - name: MINIO_ROOT_USER
+        valueFrom:
+          secretKeyRef:
+            name: minio-secret
+            key: MINIO_ROOT_USER
+      - name: MINIO_ROOT_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: minio-secret
+            key: MINIO_ROOT_PASSWORD
+  restartPolicy: Never

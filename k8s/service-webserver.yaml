@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  # This name uniquely identifies the service
+  name: webserver
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8081
+      name: inside
+      targetPort: 8081
+      protocol: TCP
+  selector:
+    # Looks for labels `app webserver` in the namespace and applies the spec
+    app: webserver

@@ -1,0 +1,40 @@
+adidas,ADS.DEX
+Airbus,AIR.DEX
+Allianz,ALV.DEX
+BASF,BAS.DEX
+Bayer,BAYN.DEX
+BMW,BMW.DEX
+Brenntag,BNR.DEX
+Continental,CON.DEX
+Covestro,1COV.DEX
+Daimler Truck,DTG.DEX
+Delivery Hero,DHER.DEX
+Deutsche Bank,DBK.DEX
+Deutsche Börse,DB1.DEX
+Deutsche Post,DPW.DEX
+Deutsche Telekom,DTE.DEX
+E.ON,EOAN.DEX
+Fresenius,FRE.DEX
+Fresenius Medical Care,FME.DEX
+Hannover Rück,HNR1.DEX
+HeidelbergCement,HEI.DEX
+HelloFresh,HFG.DEX
+Henkel vz.,HEN.DEX
+Infineon,IFX.DEX
+Linde,PLC
+Mercedes-Benz Group,0NXX.LON
+Merck,MRK.DEX
+MTU Aero Engines,MTX.DEX
+Münchener Rückversicherungs-Gesellschaft,MUV2.DEX
+Porsche Vz,PAH3.DEX
+Puma,PUM.DEX
+Qiagen,QIA.DEX
+RWE,RWE.DEX
+SAP,SAP.DEX
+Sartorius Vz,SRT3.DEX
+Siemens,SIE.DEX
+Siemens Healthineers,SHL.DEX
+Symrise,SY1.DEX
+Volkswagen (VW) vz.,VOW3.DEX
+Vonovia,VNA.DEX
+Zalando,ZAL.DEX

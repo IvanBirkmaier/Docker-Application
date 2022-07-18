@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: getdata
+  labels:
+    app: getdata
+spec:
+  containers:
+  - name: getdata
+    image: registry:5000/getdata:latest
+    command: ["/bin/sh","-c"]
+    args:
+      - while ! curl --silent -o /dev/null http://minio:9000; do echo 'Wait minio to startup...' && sleep 0.3; done; 
+        sleep 5;
+        ./app/getData.sh;
+    resources:
+      limits:
+        cpu: 300m
+        memory: 300Mi
+      requests:
+        cpu: 100m
+        memory: 100Mi
+    env:
+      - name: ALPHA_VANTAGE_FREE_KEY
+        valueFrom:
+          secretKeyRef:
+            name: alpha-vantage-free-key-secret
+            key: ALPHA_VANTAGE_FREE_KEY
+    livenessProbe:
+      exec:
+        command:
+          - curl
+          - https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=BA&apikey=demo
+      initialDelaySeconds: 5
+      timeoutSeconds: 1
+      periodSeconds: 60
+      failureThreshold: 1
+    readinessProbe:
+      exec:
+        command:
+          - bash
+          - -version
+      initialDelaySeconds: 5
+      timeoutSeconds: 1
+      periodSeconds: 10
+      failureThreshold: 1
+    volumeMounts:
+      - mountPath: "/data"
+        name: pv-storage
+  securityContext:
+    fsGroup: 1001
+  volumes:
+    - name: pv-storage
+      persistentVolumeClaim:
+        claimName: pv-claim
+  restartPolicy: Never

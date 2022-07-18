@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="forecast.js"></script>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body onload="listOfLinksforDropdown()">
+        <h1>
+            <p>DAX Unternehmen:</p>
+        </h1>
+        <p>Wählen Sie aus dem Dropdownmenü eine Aktie aus und lassen Sie sich die dazugehörige vorhersage ploten</p>
+        <div class="dropdown">
+            <button onclick="myFunction()" class="dropbtn">Dropdown</button>
+            <div id="myDropdown" class="dropdown-content" style="overflow-y: scroll; height:250px;">
+            </div>
+        </div>
+            <!-- Side Navigation -->
+        <div id="Sidenav" class="sidenav">
+            <a href="javascript:void(0)" class="closebtn" onclick="closeNav()"
+            >&times;</a>
+            <a href="index.html" role="button"> Startseite </a>
+            <a href="forecast.html" role="button"> Forecast </a>
+            <a href="scraper.html" role="button"> Scraper </a>
+        </div>
+    </body>
+</html>

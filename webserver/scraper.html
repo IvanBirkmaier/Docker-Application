@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="scraper.js"></script>
+        <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+        crossorigin="anonymous"
+        />
+    </head>
+    <body>
+        <h1>
+            <p>Twitterscraper:</p>
+        </h1>
+        <p>Um tweets scrapen zu können müssen Sie einen User festlegen von dem Sie und für einen gewissen Zeitraum 
+            alle gepostet tweets als CSV herunterladen können.
+            
+            Bitte bachten:
+            Dass dieser Service funktioniert muss der Username auch wirklich existieren, und der Zeitraum in einer 
+            bestimmten Formatierung angegeben werden : yyyy-mm-dd (z.B: 2022-04-26)
+        </p>
+        <form>
+            <div class="form-group">
+              <label for="exampleInputEmail1">Username</label>
+              <input class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Bsp. elonmusk">
+              <small id="emailHelp" class="form-text text-muted">Bitte überprüfen Sie ob der eingegebene Username auch wirklich existiert</small>
+            </div>
+            <div class="form-group">
+              <label for="exampleInputPassword1">Datum von:</label>
+              <input  class="form-control" id="exampleInputPassword1" placeholder="Bsp. 2022-01-02">
+            </div>
+            <div class="form-group">
+                <label for="exampleInputPassword2">Datum bis:</label>
+                <input  class="form-control" id="exampleInputPassword2" placeholder="Bsp. 2022-05-02">
+              </div>
+            <button onclick="test()" class="btn btn-primary">Download</button>
+          </form>
+
+
+        <div id="Sidenav" class="sidenav">
+            <a href="javascript:void(0)" class="closebtn" onclick="closeNav()"
+            >&times;</a>
+            <a href="index.html" role="button"> Startseite </a>
+            <a href="forecast.html" role="button"> Forecast </a>
+            <a href="scraper.html" role="button"> Scraper </a>
+        </div>
+    </body>
+</html>
